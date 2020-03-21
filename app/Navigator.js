@@ -6,12 +6,13 @@ import {
 
 import Categories from './screens/Categories/index';
 import Questions from './screens/Questions';
-
+import Result from './screens/Result';
 const AppStack = createAppContainer(
   createStackNavigator(
     {
       CategoryScreen: Categories,
       QuestionScreen: Questions,
+      Result: Result,
     },
     {
       headerMode: 'none',

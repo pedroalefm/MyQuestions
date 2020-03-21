@@ -18,11 +18,18 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import {withNavigation} from 'react-navigation';
+
 import Bar from '../../components/Bar';
+import ButtonNext from '../../components/ButtonNext';
+import DificultyInfo from '../../components/DificultyInfo';
+
 import axios from 'axios';
 import * as images from '../../assets';
 
 const Questions = props => {
+  const [loading, setLoading] = useState(false);
+
   const [medium, setMedium] = useState([]);
   const [easy, setEasy] = useState([]);
   const [hard, setHard] = useState([]);
@@ -47,7 +54,6 @@ const Questions = props => {
         newAnswer.level === answer[answer.length - 2].level
       ) {
         if (newAnswer.level === 'medium') {
-          console.log('mid');
           let indexNextQuestion = Math.floor(Math.random() * easyQ.length);
 
           let nextQ = easyQ[indexNextQuestion];
@@ -64,8 +70,6 @@ const Questions = props => {
           };
           setNextQuestion(nextQuestion);
         } else if (newAnswer.level === 'hard') {
-          console.log('hard');
-
           let indexNextQuestion = Math.floor(Math.random() * midQ.length);
 
           let nextQ = midQ[indexNextQuestion];
@@ -82,7 +86,6 @@ const Questions = props => {
           };
           setNextQuestion(nextQuestion);
         } else {
-          console.log('easy');
           let indexNextQuestion = Math.floor(Math.random() * easyQ.length);
 
           let nextQ = easyQ[indexNextQuestion];
@@ -134,7 +137,6 @@ const Questions = props => {
           setNextQuestion(nextQuestion);
         } else if (newAnswer.level === 'hard') {
           let indexNextQuestion = Math.floor(Math.random() * hardQ.length);
-          console.log('hard1');
           let nextQ = hardQ[indexNextQuestion];
 
           let nextQuestion = {
@@ -200,8 +202,6 @@ const Questions = props => {
           setNextQuestion(nextQuestion);
         } else if (newAnswer.level === 'medium') {
           let indexNextQuestion = Math.floor(Math.random() * hardQ.length);
-          console.log('hard4');
-
           let nextQ = hardQ[indexNextQuestion];
 
           let nextQuestion = {
@@ -217,7 +217,6 @@ const Questions = props => {
           setNextQuestion(nextQuestion);
         } else {
           let indexNextQuestion = Math.floor(Math.random() * hardQ.length);
-          console.log('hard3');
 
           let nextQ = hardQ[indexNextQuestion];
 
@@ -268,7 +267,6 @@ const Questions = props => {
           setNextQuestion(nextQuestion);
         } else if (newAnswer.level === 'hard') {
           let indexNextQuestion = Math.floor(Math.random() * hardQ.length);
-          console.log('hard2');
 
           let nextQ = hardQ[indexNextQuestion];
 
@@ -303,8 +301,7 @@ const Questions = props => {
       setNextQuestion(nextQuestion);
     }
     setShowFeedBack(false);
-    showFeedBackModal(false);
-
+    setShowFeedBackModal(false);
     setIndexSelected(null);
   };
 
@@ -328,7 +325,6 @@ const Questions = props => {
     }
     //Logica para pegar próxima questão
     if (question.alternatives[indexSelected] === question.correct_answer) {
-      console.log('SE ACERTOU');
       let newAnswer = {
         level: questionDifficult,
         correct: true,
@@ -344,7 +340,6 @@ const Questions = props => {
 
       // nextQuestionCorrect(newAnswer, currentAnswer);
     } else {
-      console.log('ERROU');
       let newAnswer = {
         level: questionDifficult,
         correct: false,
@@ -364,11 +359,9 @@ const Questions = props => {
   };
 
   useEffect(async () => {
-    console.log(props);
-    console.log('use effect');
     const category = props.navigation.state.params.category;
     setCategory(category);
-
+    setLoading(true);
     const easyQ = await axios.get(
       `https://opentdb.com/api.php?amount=10&category=${category.id}&difficulty=easy&type=multiple`,
     );
@@ -382,7 +375,6 @@ const Questions = props => {
     let indexFirstQuestion = Math.floor(
       Math.random() * mediumQ.data.results.length,
     );
-    console.log(mediumQ.data.results);
     let firstQuestion = mediumQ.data.results[indexFirstQuestion];
 
     let nextQuestion = {
@@ -400,6 +392,7 @@ const Questions = props => {
     setEasy(easyQ.data.results);
     setMedium(mediumQ.data.results);
     setHard(hardQ.data.results);
+    setLoading(false);
   }, []);
 
   shuffle = array => {
@@ -437,12 +430,22 @@ const Questions = props => {
           <Image source={newAnswer.correct ? images.CORRECT : images.ERROR} />
         </FeedBack>
       </Modal>
-
       <QuestionInfoContainer>
         <QuestionCount>Questão {answer.length + 1}</QuestionCount>
+        <DificultyInfo dificulty={nextQuestion.difficulty} />
       </QuestionInfoContainer>
       <QuestionTitle>{nextQuestion.question}</QuestionTitle>
-      <Text>{nextQuestion.difficulty}</Text>
+      {loading && (
+        <ActivityIndicator
+          size="large"
+          style={{
+            color: '#343c58',
+            position: 'absolute',
+            top: 120,
+            alignSelf: 'center',
+          }}
+        />
+      )}
       <QuestionContainer>
         {nextQuestion &&
           nextQuestion.alternatives &&
@@ -457,9 +460,20 @@ const Questions = props => {
           showFeedBack ? (
             <AnswerBtnContainer
               onPress={() =>
-                answer.correct ? nextQuestionCorrect() : nextQuestionError()
+                answer.length === 1
+                  ? props.navigation.navigate('Result', {
+                      answer: answer,
+                      category: category,
+                    })
+                  : newAnswer.correct
+                  ? nextQuestionCorrect()
+                  : nextQuestionError()
               }>
-              <AnswerBtn source={images.NEXT_BTN} />
+              {answer.length === 1 ? (
+                <ButtonNext text="Finalizar" />
+              ) : (
+                <ButtonNext text="Avançar" />
+              )}
             </AnswerBtnContainer>
           ) : (
             <AnswerBtnContainer onPress={() => answerQuestion()}>
@@ -471,4 +485,4 @@ const Questions = props => {
     </Container>
   );
 };
-export default Questions;
+export default withNavigation(Questions);
