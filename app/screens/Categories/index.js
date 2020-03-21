@@ -9,6 +9,7 @@ import {
 import {ActivityIndicator} from 'react-native';
 import Bar from '../../components/Bar';
 import axios from 'axios';
+import {withNavigation} from 'react-navigation';
 
 const Categories = props => {
   const [categories, setCategories] = useState([]);
@@ -38,7 +39,12 @@ const Categories = props => {
       )}
       <ButtonContainer>
         {categories.map(category => (
-          <Button>
+          <Button
+            onPress={() =>
+              props.navigation.navigate('QuestionScreen', {
+                category: category,
+              })
+            }>
             <ButtonText>{category.name}</ButtonText>
           </Button>
         ))}
@@ -46,4 +52,4 @@ const Categories = props => {
     </Container>
   );
 };
-export default Categories;
+export default withNavigation(Categories);

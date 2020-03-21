@@ -36,6 +36,7 @@ export const Button = styled.TouchableOpacity`
   justify-content: center;
   align-self: center;
   margin: 10px;
+  padding: 2px;
 `;
 
 export const ButtonText = styled.Text`
