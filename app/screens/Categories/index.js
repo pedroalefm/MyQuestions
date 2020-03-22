@@ -15,17 +15,21 @@ const Categories = props => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(async () => {
+  useEffect(() => {
+    console.log(props);
+    loadCategories();
+  }, []);
+  const loadCategories = async () => {
     setLoading(true);
     const res = await axios.get('https://opentdb.com/api_category.php');
     setCategories(res.data.trivia_categories);
     setLoading(false);
-  }, []);
+  };
 
   return (
     <Container>
       <Bar title="MyQuestions" />
-      <Title>Categorias</Title>
+      <Title>Categories</Title>
       {loading && (
         <ActivityIndicator
           size="large"

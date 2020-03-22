@@ -328,7 +328,7 @@ const Questions = props => {
       let newAnswer = {
         level: questionDifficult,
         correct: true,
-        question: question,
+        question: question.question,
       };
       let currentAnswer = [...answer];
       currentAnswer.push(newAnswer);
@@ -343,7 +343,7 @@ const Questions = props => {
       let newAnswer = {
         level: questionDifficult,
         correct: false,
-        question: question,
+        question: question.question,
       };
       let currentAnswer = [...answer];
       currentAnswer.push(newAnswer);
@@ -460,8 +460,8 @@ const Questions = props => {
           showFeedBack ? (
             <AnswerBtnContainer
               onPress={() =>
-                answer.length === 1
-                  ? props.navigation.navigate('Result', {
+                answer.length === 10
+                  ? props.navigation.navigate('ResultScreen', {
                       answer: answer,
                       category: category,
                     })
@@ -469,7 +469,7 @@ const Questions = props => {
                   ? nextQuestionCorrect()
                   : nextQuestionError()
               }>
-              {answer.length === 1 ? (
+              {answer.length === 10 ? (
                 <ButtonNext text="Finalizar" />
               ) : (
                 <ButtonNext text="Avançar" />

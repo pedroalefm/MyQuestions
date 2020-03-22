@@ -12,7 +12,7 @@ const AppStack = createAppContainer(
     {
       CategoryScreen: Categories,
       QuestionScreen: Questions,
-      Result: Result,
+      ResultScreen: Result,
     },
     {
       headerMode: 'none',

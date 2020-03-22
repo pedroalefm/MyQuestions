@@ -17,7 +17,8 @@ import {
 } from './style';
 import * as images from '../../assets';
 import Bar from '../../components/Bar';
-import {withNavigation} from 'react-navigation';
+import {withNavigation, NavigationActions} from 'react-navigation';
+import getRealm from '../../services/realm';
 
 const Result = props => {
   const [category, setCategory] = useState({});
@@ -47,8 +48,9 @@ const Result = props => {
     let countCorrectEasy = 0;
     let countErrorHard = 0;
     let countCorrectHard = 0;
+    const realm = await getRealm();
 
-    answers.map(answer => {
+    answers.map(async answer => {
       if (answer.level === 'medium') {
         if (answer.correct) {
           countCorrect++;
@@ -74,6 +76,9 @@ const Result = props => {
           countError++;
         }
       }
+      realm.write(() => {
+        realm.create('Answer', answer, 'modified');
+      });
     });
     setErros(countError);
     setCorrect(countCorrect);
@@ -118,7 +123,10 @@ const Result = props => {
           <TextResult>Error: {hardError}</TextResult>
         </ContainerResultItem>
       </ContainerResultDetail>
-      <BackBtn onPress={() => props.navigation.navigate('CategoryScreen')}>
+      <BackBtn
+        onPress={() =>
+          props.navigation.dispatch(NavigationActions.back('CategoryScreen'))
+        }>
         <BackBtnImg source={images.GO_TO_HOME} />
       </BackBtn>
     </Container>
